@@ -1,0 +1,22 @@
+# VulnFlow DevSecOps with the project's pipeline key.
+name: VulnFlow DevSecOps
+on:
+  push:
+    branches: [main, "feature/**"]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  vulnflow:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: VulnFlow DevSecOps scan
+        env:
+          VULNFLOW_URL: https://demo.vulnflow.com
+          VULNFLOW_KEY: ${{ secrets.VULNFLOW_KEY }}
+          VULNFLOW_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+          VULNFLOW_BRANCH: ${{ vars.VULNFLOW_BRANCH_OVERRIDE }}
+        run: |
+          curl -fsS "$VULNFLOW_URL/api/dast/devsecops/pipeline/script" -o vulnflow-devsecops.sh
+          bash vulnflow-devsecops.sh
